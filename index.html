@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rocky SMM — Pro Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#06050a; --bg-2:#0f1420;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.06);
+    --accent1:#7b61ff; --accent2:#4cc3ff;
+    --accent-grad: linear-gradient(90deg,var(--accent1),var(--accent2));
+    --muted:#b8c0d8;
+    --success:#3be08a; --danger:#ff6b6b;
+    --card-shadow: 0 10px 30px rgba(2,6,23,0.6);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui;-webkit-font-smoothing:antialiased;color:#eaf2ff;
+    background:
+    radial-gradient(900px 400px at 10% 10%, rgba(123,97,255,0.08), transparent 8%),
+    radial-gradient(700px 300px at 90% 90%, rgba(76,195,255,0.06), transparent 8%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  }
+
+  /* Top */
+  .top{
+    display:flex;justify-content:space-between;align-items:center;padding:18px 24px;
+    border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),#a066ff 60%,var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  .brand h1{font-size:18px;margin:0}
+  .brand p{margin:0;color:var(--muted);font-size:13px}
+  .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+  .btn-ghost{background:transparent;border:1px solid var(--glass-border);color:var(--muted)}
+  .btn-primary{background:var(--accent-grad);color:#041026;box-shadow:0 10px 30px rgba(123,97,255,0.12)}
+
+  /* layout */
+  .wrap{display:grid;grid-template-columns:1fr;gap:20px;padding:22px}
+
+  /* cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    border-radius:14px;padding:16px;border:1px solid var(--glass-border);
+    box-shadow:var(--card-shadow);backdrop-filter:blur(8px);position:relative;
+    min-height:150px;display:flex;flex-direction:column;justify-content:space-between;
+    transition:transform .28s,box-shadow .28s;
+  }
+  .card:hover{transform:translateY(-8px);box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+  .card h3{margin:0;font-size:16px}
+  .price{font-weight:800;font-size:20px;color:#fff}
+  .sub{color:var(--muted);font-size:13px;margin-top:6px}
+  .buy{margin-top:10px;border-radius:10px;padding:10px 12px;border:none;background:var(--accent-grad);
+    font-weight:800;color:#041026;cursor:pointer}
+  .badge-pop{position:absolute;right:12px;top:12px;background:linear-gradient(90deg,#ff7a2b,#ff3f7a);
+    color:#fff;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+
+  /* panel */
+  .panel{
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    padding:18px;border-radius:14px;border:1px solid var(--glass-border);
+    box-shadow:var(--card-shadow);backdrop-filter:blur(8px);
+  }
+  .input{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+    background:#0b0d13;color:#fff;margin-top:10px}
+
+  /* admin floating */
+  .admin-floating{
+    position:fixed;right:18px;bottom:18px;background:linear-gradient(90deg,var(--accent1),#a066ff);
+    padding:12px 14px;border-radius:12px;color:white;font-weight:800;cursor:pointer;
+    box-shadow:0 12px 40px rgba(76,195,255,0.06)
+  }
+
+  /* modal */
+  .modal-wrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(3,6,10,0.6);z-index:60}
+  .modal{background:#0f1220;border-radius:12px;padding:18px;width:360px;border:1px solid rgba(255,255,255,0.04);
+    box-shadow:0 30px 80px rgba(2,6,23,0.8)}
+  .modal h3{margin:0 0 10px 0}
+
+  /* admin */
+  .admin-wrap{display:none;padding:22px}
+  .table{width:100%;border-collapse:collapse;margin-top:12px}
+  .table th,.table td{padding:10px 8px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left;font-size:14px}
+  .chip{padding:6px 8px;border-radius:8px;font-weight:700;font-size:13px}
+  .chip.pending{background:#2d2f40;color:var(--muted)}
+  .chip.progress{background:linear-gradient(90deg,#ffd86b,#ff9f32);color:#3b2500}
+  .chip.completed{background:linear-gradient(90deg,#7be28a,#3bbd70);color:#052612}
+  .chip.rejected{background:linear-gradient(90deg,#ff8a8a,#ff5f5f);color:#340808}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:30px;background:var(--accent-grad);
+    padding:12px 18px;border-radius:12px;color:#041026;font-weight:700;z-index:80}
+
+</style>
+</head>
+<body>
+
+<!-- TOP -->
+<div class="top">
+  <div class="brand">
+    <div class="logo">RD</div>
+    <div>
+      <h1>Rocky SMM — Pro</h1>
+      <p>Fast • Secure • Neon UI</p>
+    </div>
+  </div>
+
+  <div>
+    <button class="btn btn-ghost" onclick="location.href='https://wa.me/8801405167028'">WhatsApp</button>
+    <button class="btn btn-primary" onclick="openAdminModal()">Admin</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap">
+
+  <div>
+    <h2>Followers Packages</h2>
+    <p style="color:var(--muted)">Select package → enter link → pay bKash → submit TRX</p>
+
+    <div class="cards">
+      <div class="card" data-name="100 Followers" data-price="10">
+        <h3>100 Followers</h3>
+        <div class="price">৳10</div>
+        <div class="sub">Delivery: 0–1 hrs</div>
+        <button class="buy" onclick="pickPackage(this)">Buy</button>
+      </div>
+
+      <div class="card" data-name="500 Followers" data-price="50">
+        <h3>500 Followers</h3>
+        <div class="price">৳50</div>
+        <div class="sub">Delivery: 0–6 hrs</div>
+        <button class="buy" onclick="pickPackage(this)">Buy</button>
+      </div>
+
+      <div class="card" data-name="1000 Followers" data-price="99">
+        <div class="badge-pop">🔥 Popular</div>
+        <h3>1000 Followers</h3>
+        <div class="price">৳99</div>
+        <div class="sub">Fast Delivery</div>
+        <button class="buy" onclick="pickPackage(this)">Buy</button>
+      </div>
+
+      <div class="card" data-name="10000 Followers" data-price="990">
+        <h3>10,000 Followers</h3>
+        <div class="price">৳990</div>
+        <div class="sub">Bulk 0–24 hrs</div>
+        <button class="buy" onclick="pickPackage(this)">Buy</button>
+      </div>
+    </div>
+
+    <!-- ORDER -->
+    <div class="panel" style="margin-top:20px;">
+      <h2>Place Order</h2>
+      <div id="orderSummary" style="color:var(--muted)">No package selected</div>
+
+      <input id="cusName" class="input" placeholder="Your name (optional)">
+      <input id="cusPhone" class="input" placeholder="Phone number">
+      <input id="cusLink" class="input" placeholder="Profile link (required)">
+      <input id="cusTxn" class="input" placeholder="bKash Transaction ID (required)">
+
+      <button class="btn btn-primary" style="margin-top:14px;width:100%;height:46px"
+        onclick="submitOrder()">Submit Order</button>
+
+      <p style="margin-top:12px;color:var(--muted)">
+        Send Money: <b>01765568009</b><br>
+        Payment: <b>01405167028</b>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminModal" class="modal-wrap">
+  <div class="modal">
+    <h3>Admin Login</h3>
+    <input id="adminPin" class="input" placeholder="Enter PIN">
+    <button class="btn btn-primary" style="margin-top:12px;width:100%" onclick="verifyPin()">Enter</button>
+    <button class="btn btn-ghost" style="margin-top:8px;width:100%" onclick="closeAdminModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage" class="admin-wrap">
+  <h2>Admin Dashboard</h2>
+
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <select id="filterStatus" class="input" style="width:200px" onchange="renderAdminTable()">
+      <option value="All">All</option>
+      <option value="Pending">Pending</option>
+      <option value="In-Progress">In-Progress</option>
+      <option value="Completed">Completed</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+
+    <input id="searchBox" class="input" placeholder="Search anything" oninput="renderAdminTable()">
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th><th>Package</th><th>Price</th><th>Link</th><th>Txn</th>
+        <th>Name</th><th>Phone</th><th>Status</th><th>Date</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTbody"></tbody>
+  </table>
+
+  <button class="btn btn-ghost" style="margin-top:16px" onclick="closeAdminPage()">Close Admin</button>
+</div>
+
+<!-- floating -->
+<div class="admin-floating" onclick="openAdminModal()">Admin</div>
+
+<div id="toastWrap"></div>
+
+<script>
+const STORAGE_KEY = 'rd_smm_orders_final';
+let orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let selected = null;
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
+
+function showToast(t){
+  const x=document.createElement('div'); x.className='toast'; x.textContent=t;
+  document.body.appendChild(x);
+  setTimeout(()=>x.style.opacity='0',2200);
+  setTimeout(()=>x.remove(),2600);
+}
+
+function pickPackage(btn){
+  const card = btn.closest('.card');
+  selected = {name:card.dataset.name, price:card.dataset.price};
+  document.getElementById('orderSummary').innerHTML = `<b>${selected.name}</b> • ৳${selected.price}`;
+  showToast("Package Selected");
+}
+
+function submitOrder(){
+  if(!selected) return alert("প্যাকেজ সিলেক্ট করুন");
+
+  const link = cusLink.value.trim();
+  const txn  = cusTxn.value.trim();
+  if(!link || !txn) return alert("Link & Txn ID প্রয়োজন!");
+
+  orders.push({
+    id: Date.now(),
+    package: selected.name,
+    price: selected.price,
+    link, txn,
+    name: cusName.value,
+    phone: cusPhone.value,
+    status: "Pending",
+    created_at: new Date().toLocaleString()
+  });
+
+  save();
+  showToast("Order Submitted");
+
+  selected=null;
+  orderSummary.textContent="No package selected";
+  cusName.value=cusPhone.value=cusLink.value=cusTxn.value="";
+  renderAdminTable();
+}
+
+function openAdminModal(){ adminModal.style.display='flex'; adminPin.value=""; }
+function closeAdminModal(){ adminModal.style.display='none'; }
+
+function verifyPin(){
+  if(adminPin.value==="admin123"){
+    closeAdminModal();
+    adminPage.style.display='block';
+    renderAdminTable();
+    showToast("Welcome Admin");
+  }else alert("Wrong PIN");
+}
+
+function closeAdminPage(){ adminPage.style.display='none'; }
+
+function renderAdminTable(){
+  const tb = ordersTbody;
+  tb.innerHTML="";
+
+  let list = orders.slice().reverse();
+  const f = filterStatus.value;
+  const q = searchBox.value.toLowerCase();
+
+  if(f!=="All") list=list.filter(o=>o.status===f);
+  if(q) list=list.filter(o =>
+    (o.package+" "+o.link+" "+o.txn+" "+o.name+" "+o.phone).toLowerCase().includes(q)
+  );
+
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--muted)">No orders</td></tr>`;
+    return;
+  }
+
+  list.forEach((o,i)=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${o.package}</td>
+        <td>৳${o.price}</td>
+        <td><a href="${o.link}" target="_blank" style="color:var(--accent2)">${o.link.slice(0,30)}...</a></td>
+        <td>${o.txn}</td>
+        <td>${o.name||'—'}</td>
+        <td>${o.phone||'—'}</td>
+        <td>${statusChip(o.status)}</td>
+        <td>${o.created_at}</td>
+        <td>
+          <button class="btn-ghost" onclick="setStatus(${o.id},'Pending')">Pending</button>
+          <button class="btn-ghost" onclick="setStatus(${o.id},'In-Progress')">Running</button>
+          <button class="btn-ghost" onclick="setStatus(${o.id},'Completed')">Done</button>
+          <button class="btn-ghost" onclick="setStatus(${o.id},'Rejected')">Reject</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function statusChip(s){
+  return `<span class="chip ${s==='Pending'?'pending':s==='In-Progress'?'progress':s==='Completed'?'completed':'rejected'}">${s}</span>`;
+}
+
+function setStatus(id,newS){
+  const x=orders.find(o=>o.id==id);
+  if(!x) return;
+  x.status=newS;
+  save();
+  renderAdminTable();
+  showToast("Status Updated");
+}
+
+</script>
+</body>
+</html>
